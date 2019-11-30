@@ -52,17 +52,7 @@ class PostController extends Controller
         // redirect to users list with success message
 
         //dd($request->all());
-        if ($request->hasFile('image')) {
-            // upload 'avatar' image for the user
-            $request['image'] = $request->file('image')->store('image');
-        } else {
-            // to set default value for 'avatar' if no image has been uploaded
-            $request['image'] = null;
-        }
-        // to activate the created user by default
-        $request['status'] = true;
-          
-
+      
          $this->validate($request ,[
 
             "title" => "required",
@@ -70,12 +60,20 @@ class PostController extends Controller
             'category_id'=>"required",
              
           ]);
-
+          $imge = $request->imge;
+          $imge_new_name = time().$imge->getClientOriginalName();
+          $imge->move('uploads/posts/',$imge_new_name);
          
         // add created by details 
-        $request['user_id'] = Auth::id();
+                // $request['user_id'] = Auth::id();
         // create and insert the new user data
-        Post::create($request->all());
+        $post = Post::create([
+            "title"    => $request->title,
+            "content"  => $request->content,
+            "category_id"  => $request->category_id,
+            "imge" => 'uploads/posts/'.$imge_new_name,
+            "user_id" => Auth::id()
+        ]);
 
           return redirect()->route('post.index')->with('success', 'The Post is added');
     }
@@ -99,8 +97,9 @@ class PostController extends Controller
      */
     public function edit($id)
     {
+        $categories=Category::All();
         $post=Post::find($id);
-        return view('backend.post.edit')->with('post',$post );
+        return view('backend.post.edit')->with('post',$post )->with('categories',$categories );
     }
 
     /**
@@ -112,10 +111,34 @@ class PostController extends Controller
      */
     public function update(Request $request, $id)
     {
+
+        
+       
+        $this->validate($request ,[
+
+            "title" => "required",
+            "content" => "required",
+            'category_id'=>"required",
+             
+          ]);
+
+
+          if ( $request->hasFile('imge')  ) {
+            $imge = $request->imge;
+            $imge_new_name = time().$imge->getClientOriginalName();
+            $imge->move('uploads/posts/',$imge_new_name);
+           
+    
+        }
+
+
         $post=Post::find($id);
         $post->title = $request->input('title');
         $post->content =$request->input('content');
+        $post->imge = 'uploads/posts/'.$imge_new_name;
         $post->save();
+
+        return redirect()->route('post.index')->with('status', 'The Post is updated');
     }
 
     /**

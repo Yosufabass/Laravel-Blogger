@@ -9,6 +9,12 @@ class Post extends Model
 
      protected $fillable =['title', 'content', 'user_id','imge', 'category_id'];
 
+
+     public function eetImgeAtrribute($imge){
+
+        return asset($imge);
+
+    }
      
     public function category(){
 
