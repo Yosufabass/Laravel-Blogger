@@ -27,5 +27,6 @@ Route::group(['middleware'=>'auth'],function(){
 
 Route::resource('/post','backend\PostController');
 Route::resource('/catecory','backend\CategoryController');
+Route::resource('/tag','backend\TagController');
 
 });

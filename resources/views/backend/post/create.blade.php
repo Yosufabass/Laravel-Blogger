@@ -47,6 +47,15 @@
                                     @endforeach
                                     </select>
                                   </div>
+
+                                  <div class="form-group">
+                                        <label for="tags">Tags</label>
+                                        <select id="tags" class="form-control tags_items" name="tag_id[]" multiple="multiple">
+                                            @foreach ($tags as $tag)
+                                            <option value="{{ $tag->id}}">{{ $tag->tag_name}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
                             <div class="form-group">
                              <label  for="imge">photp</label>
                               <input type="file" class="form-control-file" name="imge">

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\backend;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Post;
+use App\Tag;
 use App\Category;
 use Illuminate\Support\Facades\Auth;
 class PostController extends Controller
@@ -37,7 +38,9 @@ class PostController extends Controller
     public function create()
     {
         $categories=Category::All();
-        return view('backend.post.create')->with('categories',$categories);
+        $tags=Tag::all();
+        return view('backend.post.create')->with('categories',$categories)->
+        with('tags',$tags);
     }
 
     /**
@@ -72,8 +75,10 @@ class PostController extends Controller
             "content"  => $request->content,
             "category_id"  => $request->category_id,
             "imge" => 'uploads/posts/'.$imge_new_name,
+            
             "user_id" => Auth::id()
         ]);
+        $post->tag()->attach($request->tag_id);
 
           return redirect()->route('post.index')->with('success', 'The Post is added');
     }
@@ -97,9 +102,11 @@ class PostController extends Controller
      */
     public function edit($id)
     {
+        $tags=Tag::All();
         $categories=Category::All();
         $post=Post::find($id);
-        return view('backend.post.edit')->with('post',$post )->with('categories',$categories );
+        return view('backend.post.edit')->with('post',$post )->with('categories',$categories )->
+        with('tags',$tags);
     }
 
     /**
@@ -112,7 +119,7 @@ class PostController extends Controller
     public function update(Request $request, $id)
     {
 
-        
+        $post=Post::find($id);
        
         $this->validate($request ,[
 
@@ -128,14 +135,14 @@ class PostController extends Controller
             $imge_new_name = time().$imge->getClientOriginalName();
             $imge->move('uploads/posts/',$imge_new_name);
            
-    
+            $post->imge = 'uploads/posts/'.$imge_new_name;
         }
 
 
-        $post=Post::find($id);
+        
         $post->title = $request->input('title');
         $post->content =$request->input('content');
-        $post->imge = 'uploads/posts/'.$imge_new_name;
+       
         $post->save();
 
         return redirect()->route('post.index')->with('status', 'The Post is updated');
