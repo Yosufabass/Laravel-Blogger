@@ -4,7 +4,9 @@ namespace App\Http\Controllers\backend;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-
+use App\User;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 class UserController extends Controller
 {
     /**
@@ -14,7 +16,9 @@ class UserController extends Controller
      */
     public function index()
     {
-        //
+        
+        $users=User::all();
+        return view('backend.user.index')->with('users',$users);
     }
 
     /**
@@ -24,7 +28,8 @@ class UserController extends Controller
      */
     public function create()
     {
-        //
+        
+        return view('backend.user.create');
     }
 
     /**
@@ -35,7 +40,26 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        
+       
+        
+        $this->validate($request ,[
+            "name"=>"required",
+            "email"=>"required",
+            "mobile"=>"required",
+            "password"=>"required",
+            
+        ]);
+          User::create([
+            "name"=>$request->name,  
+            "email"=>$request->email,  
+            "mobile"=>$request->mobile,  
+            'password' => Hash::make($request['password']),  
+            
+
+          ]);
+
+        return redirect()->route('user.index')->with('success', 'The new user is added');
     }
 
     /**
